@@ -1,0 +1,8 @@
+{
+  "name": "hateoas-frontend",
+  "version": "1.0.0",
+  "description": "Frontend interativo para demo HATEOAS",
+  "scripts": {
+    "dev": "npx -y serve -l 3001 ."
+  }
+}

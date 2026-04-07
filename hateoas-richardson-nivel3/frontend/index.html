@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Demonstração interativa do Nível 3 do Modelo de Maturidade de Richardson - HATEOAS">
+  <title>HATEOAS Demo — Nível 3 Richardson</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Partículas de fundo decorativas -->
+  <div class="bg-particles" id="bgParticles"></div>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <div class="header-brand">
+        <div class="logo-icon">
+          <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="20" cy="20" r="18" stroke="url(#grad)" stroke-width="2.5" fill="none"/>
+            <path d="M12 20 L18 26 L28 14" stroke="url(#grad)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <defs>
+              <linearGradient id="grad" x1="0" y1="0" x2="40" y2="40">
+                <stop offset="0%" stop-color="#6366f1"/>
+                <stop offset="100%" stop-color="#a855f7"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <div>
+          <h1>HATEOAS Explorer</h1>
+          <p class="header-subtitle">Nível 3 — Modelo de Maturidade de Richardson</p>
+        </div>
+      </div>
+      <div class="header-badge">
+        <span class="badge-dot"></span>
+        API Bancária
+      </div>
+    </div>
+  </header>
+
+  <!-- Seção de Introdução didática -->
+  <section class="intro-section">
+    <div class="container">
+      <div class="intro-grid">
+        <div class="intro-card" data-level="2">
+          <div class="level-tag">Nível 2</div>
+          <h3>Sem HATEOAS</h3>
+          <p>Resposta traz apenas os dados. O front-end precisa <strong>saber de antemão</strong> todas as URLs e regras de negócio.</p>
+          <div class="code-preview">
+            <div class="code-header">
+              <span class="code-dot red"></span>
+              <span class="code-dot yellow"></span>
+              <span class="code-dot green"></span>
+              <span>GET /contas/1</span>
+            </div>
+            <pre><code>{
+  "id": 1,
+  "titular": "Maria Silva",
+  "saldo": 5200.00
+}</code></pre>
+          </div>
+          <p class="intro-footnote">❌ E agora? Como sacar? Qual URL? O dev precisa adivinhar.</p>
+        </div>
+
+        <div class="intro-arrow">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </div>
+
+        <div class="intro-card highlighted" data-level="3">
+          <div class="level-tag">Nível 3</div>
+          <h3>Com HATEOAS ✨</h3>
+          <p>Resposta inclui <strong>links dinâmicos</strong> indicando as ações possíveis baseadas no <em>estado atual</em> do recurso.</p>
+          <div class="code-preview">
+            <div class="code-header">
+              <span class="code-dot red"></span>
+              <span class="code-dot yellow"></span>
+              <span class="code-dot green"></span>
+              <span>GET /contas/1</span>
+            </div>
+            <pre><code>{
+  "id": 1,
+  "titular": "Maria Silva",
+  "saldo": 5200.00,
+  <span class="highlight-links">"_links": {
+    "sacar": { "href": "…/sacar" },
+    "transferir": { "href": "…/transferir" },
+    "extrato": { "href": "…/extrato" }
+  }</span>
+}</code></pre>
+          </div>
+          <p class="intro-footnote">✅ O front-end renderiza botões com base nos links recebidos!</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Conteúdo principal -->
+  <main class="main-content">
+    <div class="container">
+
+      <!-- Painel de seleção de contas -->
+      <section class="accounts-panel" id="accountsPanel">
+        <div class="panel-header">
+          <h2>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+            Selecione uma Conta
+          </h2>
+          <p>Explore diferentes estados e veja os links HATEOAS mudarem dinamicamente</p>
+        </div>
+        <div class="accounts-grid" id="accountsGrid">
+          <!-- Preenchido dinamicamente -->
+        </div>
+      </section>
+
+      <!-- Área principal: dividida em painel de dados + JSON -->
+      <section class="explorer-section" id="explorerSection" style="display: none;">
+        <div class="explorer-grid">
+
+          <!-- Painel da conta -->
+          <div class="account-detail-panel" id="accountDetailPanel">
+            <div class="detail-header" id="detailHeader">
+              <!-- Preenchido dinamicamente -->
+            </div>
+            <div class="detail-body">
+              <!-- Ações HATEOAS renderizadas dinamicamente -->
+              <div class="actions-section">
+                <h3>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                  </svg>
+                  Ações Disponíveis <span class="hateoas-tag">via _links HATEOAS</span>
+                </h3>
+                <p class="actions-hint">Estes botões são gerados <strong>exclusivamente</strong> a partir dos links retornados pela API. O front-end não possui lógica própria para decidir o que exibir.</p>
+                <div class="actions-grid" id="actionsGrid">
+                  <!-- Preenchido dinamicamente -->
+                </div>
+              </div>
+
+              <!-- Resultado da última ação -->
+              <div class="result-section" id="resultSection" style="display: none;">
+                <h3>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                  </svg>
+                  Resultado da Ação
+                </h3>
+                <div class="result-message" id="resultMessage"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Painel JSON ao vivo -->
+          <div class="json-panel">
+            <div class="json-header">
+              <h3>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                  <polyline points="16 18 22 12 16 6"/>
+                  <polyline points="8 6 2 12 8 18"/>
+                </svg>
+                Resposta da API (JSON ao vivo)
+              </h3>
+              <button class="copy-btn" id="copyJsonBtn" title="Copiar JSON">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                </svg>
+              </button>
+            </div>
+            <div class="json-endpoint" id="jsonEndpoint">GET /contas</div>
+            <pre class="json-body" id="jsonBody"><code>// Selecione uma conta para iniciar</code></pre>
+            <div class="json-legend">
+              <span class="legend-item">
+                <span class="legend-color links-color"></span>
+                _links (HATEOAS)
+              </span>
+              <span class="legend-item">
+                <span class="legend-color data-color"></span>
+                Dados do recurso
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Seção Explicativa: Como o estado muda os links -->
+      <section class="state-demo-section">
+        <div class="panel-header">
+          <h2>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24">
+              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+              <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+            </svg>
+            Como o Estado muda os Links?
+          </h2>
+          <p>O "S" de HATEOAS é <strong>State</strong> (Estado). Veja como o mesmo endpoint retorna links diferentes dependendo do estado.</p>
+        </div>
+        <div class="state-examples-grid">
+          <div class="state-card">
+            <div class="state-icon positive">💰</div>
+            <h4>Saldo Positivo</h4>
+            <p>R$ 5.200,00</p>
+            <div class="state-links">
+              <span class="link-chip available">✅ sacar</span>
+              <span class="link-chip available">✅ transferir</span>
+              <span class="link-chip available">✅ depositar</span>
+              <span class="link-chip available">✅ extrato</span>
+              <span class="link-chip unavailable">❌ empréstimo</span>
+            </div>
+          </div>
+          <div class="state-card">
+            <div class="state-icon zero">🟡</div>
+            <h4>Saldo Zero</h4>
+            <p>R$ 0,00</p>
+            <div class="state-links">
+              <span class="link-chip unavailable">❌ sacar</span>
+              <span class="link-chip unavailable">❌ transferir</span>
+              <span class="link-chip available">✅ depositar</span>
+              <span class="link-chip available">✅ extrato</span>
+              <span class="link-chip available">✅ empréstimo</span>
+            </div>
+          </div>
+          <div class="state-card">
+            <div class="state-icon inactive">🔒</div>
+            <h4>Conta Inativa</h4>
+            <p>Desativada</p>
+            <div class="state-links">
+              <span class="link-chip unavailable">❌ sacar</span>
+              <span class="link-chip unavailable">❌ transferir</span>
+              <span class="link-chip unavailable">❌ depositar</span>
+              <span class="link-chip available">✅ extrato</span>
+              <span class="link-chip available">✅ reativar</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <p>Demonstração didática — Nível 3 do Modelo de Maturidade de Richardson (HATEOAS)</p>
+      <p class="footer-small">Hipermídia como Motor do Estado da Aplicação</p>
+    </div>
+  </footer>
+
+  <!-- Modal para formulários de ação -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal" id="actionModal">
+      <div class="modal-header">
+        <h3 id="modalTitle">Ação</h3>
+        <button class="modal-close" id="modalClose">&times;</button>
+      </div>
+      <div class="modal-body" id="modalBody">
+        <!-- Formulário dinâmico -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="modalCancel">Cancelar</button>
+        <button class="btn btn-primary" id="modalConfirm">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
