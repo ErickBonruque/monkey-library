@@ -1,0 +1,51 @@
+id_escola,tipo_escola,tipo_escola_descricao,dependencia_adm,dependencia_adm_descricao,localizacao,localizacao_descricao,ensino,ensino_descricao
+0,2,Publica,3,Municipal,2,Rural,,
+1,3,Privada,2,Estadual,1,Urbana,,
+2,3,Privada,1,Federal,1,Urbana,,
+3,3,Privada,4,Privada,1,Urbana,2,Educacao Especial - Modalidade Substitutiva
+4,3,Privada,2,Estadual,1,Urbana,2,Educacao Especial - Modalidade Substitutiva
+5,2,Publica,1,Federal,2,Rural,2,Educacao Especial - Modalidade Substitutiva
+6,2,Publica,2,Estadual,1,Urbana,2,Educacao Especial - Modalidade Substitutiva
+7,2,Publica,2,Estadual,2,Rural,,
+8,2,Publica,4,Privada,2,Rural,1,Ensino Regular
+9,3,Privada,4,Privada,2,Rural,2,Educacao Especial - Modalidade Substitutiva
+10,3,Privada,2,Estadual,1,Urbana,1,Ensino Regular
+11,2,Publica,2,Estadual,1,Urbana,1,Ensino Regular
+12,2,Publica,1,Federal,1,Urbana,1,Ensino Regular
+13,2,Publica,,,,,2,Educacao Especial - Modalidade Substitutiva
+14,2,Publica,1,Federal,2,Rural,,
+15,2,Publica,2,Estadual,2,Rural,1,Ensino Regular
+16,3,Privada,4,Privada,1,Urbana,,
+17,2,Publica,4,Privada,1,Urbana,,
+18,2,Publica,4,Privada,1,Urbana,2,Educacao Especial - Modalidade Substitutiva
+19,2,Publica,4,Privada,2,Rural,,
+20,2,Publica,,,,,1,Ensino Regular
+21,3,Privada,3,Municipal,2,Rural,1,Ensino Regular
+22,3,Privada,,,,,2,Educacao Especial - Modalidade Substitutiva
+23,2,Publica,3,Municipal,2,Rural,2,Educacao Especial - Modalidade Substitutiva
+24,3,Privada,4,Privada,2,Rural,,
+25,2,Publica,3,Municipal,2,Rural,1,Ensino Regular
+26,1,Nao respondeu,2,Estadual,1,Urbana,,
+27,1,Nao respondeu,,,,,1,Ensino Regular
+28,2,Publica,2,Estadual,1,Urbana,,
+29,2,Publica,1,Federal,1,Urbana,2,Educacao Especial - Modalidade Substitutiva
+30,2,Publica,1,Federal,2,Rural,1,Ensino Regular
+31,2,Publica,3,Municipal,1,Urbana,1,Ensino Regular
+32,3,Privada,2,Estadual,2,Rural,1,Ensino Regular
+33,2,Publica,4,Privada,2,Rural,2,Educacao Especial - Modalidade Substitutiva
+34,2,Publica,,,,,,
+35,3,Privada,1,Federal,1,Urbana,1,Ensino Regular
+36,2,Publica,3,Municipal,1,Urbana,,
+37,3,Privada,4,Privada,2,Rural,1,Ensino Regular
+38,3,Privada,3,Municipal,1,Urbana,1,Ensino Regular
+39,3,Privada,,,,,,
+40,1,Nao respondeu,2,Estadual,1,Urbana,1,Ensino Regular
+41,1,Nao respondeu,,,,,,
+42,2,Publica,1,Federal,1,Urbana,,
+43,2,Publica,4,Privada,1,Urbana,1,Ensino Regular
+44,2,Publica,2,Estadual,2,Rural,2,Educacao Especial - Modalidade Substitutiva
+45,3,Privada,,,,,1,Ensino Regular
+46,3,Privada,4,Privada,1,Urbana,1,Ensino Regular
+47,3,Privada,1,Federal,1,Urbana,2,Educacao Especial - Modalidade Substitutiva
+48,3,Privada,1,Federal,2,Rural,1,Ensino Regular
+49,2,Publica,3,Municipal,1,Urbana,2,Educacao Especial - Modalidade Substitutiva

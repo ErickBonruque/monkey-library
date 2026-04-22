@@ -32,6 +32,7 @@ MANIFEST
 # Installer logs
 pip-log.txt
 pip-delete-this-directory.txt
+*.pdf
 
 # Unit test / coverage reports
 htmlcov/
@@ -119,3 +120,10 @@ yarn-error.log*
 # OS
 .DS_Store
 Thumbs.db
+
+# big-data-atividade-01 - arquivos especificos
+big-data-atividade-01/microdados_enem/
+big-data-atividade-01/venv/
+big-data-atividade-01/.venv/
+big-data-atividade-01/etl_star_schema.py
+big-data-atividade-01/star_schema_csvs/fact_enem_scores.csv
