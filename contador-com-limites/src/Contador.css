@@ -1,0 +1,44 @@
+.contador {
+  max-width: 360px;
+  margin: 40px auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-family: Arial, sans-serif;
+  text-align: center;
+}
+
+.contador h1 {
+  margin-top: 0;
+}
+
+.valor {
+  font-size: 48px;
+  font-weight: bold;
+  margin: 16px 0;
+}
+
+.botoes {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.botoes button {
+  padding: 8px 16px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.campo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.campo input {
+  width: 80px;
+  padding: 4px;
+}
