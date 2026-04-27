@@ -36,7 +36,3 @@ Ou execute a classe CheckpointApi01Application pela IDE.
 ## Status
 
 - Build validado com sucesso usando mvn test.
-
-<div style="text-align: center;">
-  <img src="[https://i.pinimg.com/736x/43/ac/52/43ac52b7eaa8990b593006daf2297103.jpg](https://i.pinimg.com/1200x/c2/d3/1c/c2d31c853267377039d2fcc2dfd11376.jpg)" alt="Projeto Web" style="width: 900px; height: 900px; object-fit: cover; border-radius: 8px;">
-</div>
