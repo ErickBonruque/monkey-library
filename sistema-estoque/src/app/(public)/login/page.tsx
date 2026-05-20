@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect } from "react"
 import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useRouter } from "next/navigation"
@@ -25,10 +26,11 @@ export default function LoginPage() {
     defaultValues: { email: "", password: "" },
   })
 
-  if (isAuthenticated) {
-    router.push("/admin")
-    return null
-  }
+  useEffect(() => {
+    if (isAuthenticated) router.push("/admin")
+  }, [isAuthenticated, router])
+
+  if (isAuthenticated) return null
 
   async function onSubmit(data: LoginFormData) {
     try {
