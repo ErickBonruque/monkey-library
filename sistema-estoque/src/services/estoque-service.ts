@@ -1,72 +1,50 @@
+import { api } from "@/lib/api"
 import type { Product, Category, StockExit, KPIData } from "@/types"
-import { mockProducts, mockCategories, mockExits } from "@/mocks"
 
 export const estoqueService = {
   async getProducts(): Promise<Product[]> {
-    await new Promise((res) => setTimeout(res, 600))
-    return [...mockProducts]
+    const { data } = await api.get<Product[]>("/products")
+    return data
   },
 
   async createProduct(data: Omit<Product, "id" | "createdAt" | "categoryName">): Promise<Product> {
-    await new Promise((res) => setTimeout(res, 500))
-    const category = mockCategories.find((c) => c.id === data.categoryId)
-    return {
-      ...data,
-      id: String(Date.now()),
-      categoryName: category?.name ?? "",
-      createdAt: new Date().toISOString(),
-    }
+    const { data: product } = await api.post<Product>("/products", data)
+    return product
   },
 
   async updateProduct(id: string, data: Partial<Product>): Promise<Product> {
-    await new Promise((res) => setTimeout(res, 500))
-    const product = mockProducts.find((p) => p.id === id)
-    if (!product) throw new Error("Produto não encontrado")
-    return { ...product, ...data }
+    const { data: product } = await api.put<Product>(`/products/${id}`, data)
+    return product
   },
 
   async deleteProduct(id: string): Promise<void> {
-    await new Promise((res) => setTimeout(res, 400))
-    console.log("Produto deletado:", id)
+    await api.delete(`/products/${id}`)
   },
 
   async getCategories(): Promise<Category[]> {
-    await new Promise((res) => setTimeout(res, 400))
-    return [...mockCategories]
+    const { data } = await api.get<Category[]>("/categories")
+    return data
   },
 
   async createCategory(data: Omit<Category, "id">): Promise<Category> {
-    await new Promise((res) => setTimeout(res, 400))
-    return { ...data, id: String(Date.now()) }
+    const { data: category } = await api.post<Category>("/categories", data)
+    return category
   },
 
   async getExits(): Promise<StockExit[]> {
-    await new Promise((res) => setTimeout(res, 600))
-    return [...mockExits]
+    const { data } = await api.get<StockExit[]>("/exits")
+    return data
   },
 
-  async registerExit(data: Omit<StockExit, "id" | "createdAt" | "productName" | "createdBy">): Promise<StockExit> {
-    await new Promise((res) => setTimeout(res, 500))
-    const product = mockProducts.find((p) => p.id === data.productId)
-    return {
-      ...data,
-      id: String(Date.now()),
-      productName: product?.name ?? "",
-      createdAt: new Date().toISOString(),
-      createdBy: "Usuário Atual",
-    }
+  async registerExit(
+    data: Omit<StockExit, "id" | "createdAt" | "productName" | "createdBy">
+  ): Promise<StockExit> {
+    const { data: exit } = await api.post<StockExit>("/exits", data)
+    return exit
   },
 
   async getKPIs(): Promise<KPIData> {
-    await new Promise((res) => setTimeout(res, 500))
-    const products = mockProducts
-    const lowStock = products.filter((p) => p.quantity <= p.minQuantity)
-    const totalValue = products.reduce((sum, p) => sum + p.quantity * p.price, 0)
-    return {
-      totalProducts: products.length,
-      lowStockCount: lowStock.length,
-      exitsThisMonth: mockExits.length,
-      totalValue,
-    }
+    const { data } = await api.get<KPIData>("/kpis")
+    return data
   },
 }

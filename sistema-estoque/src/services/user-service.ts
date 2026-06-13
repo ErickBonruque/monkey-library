@@ -1,21 +1,18 @@
+import { api } from "@/lib/api"
 import type { User } from "@/types"
-import { mockUsers } from "@/mocks"
 
 export const userService = {
   async getAll(): Promise<User[]> {
-    await new Promise((res) => setTimeout(res, 600))
-    return [...mockUsers]
+    const { data } = await api.get<User[]>("/users")
+    return data
   },
 
   async update(id: string, data: Partial<User>): Promise<User> {
-    await new Promise((res) => setTimeout(res, 500))
-    const user = mockUsers.find((u) => u.id === id)
-    if (!user) throw new Error("Usuário não encontrado")
-    return { ...user, ...data }
+    const { data: user } = await api.put<User>(`/users/${id}`, data)
+    return user
   },
 
   async invite(email: string, role: User["role"]): Promise<void> {
-    await new Promise((res) => setTimeout(res, 700))
-    console.log("Convite enviado para", email, "com papel", role)
+    await api.post("/users/invite", { email, role })
   },
 }

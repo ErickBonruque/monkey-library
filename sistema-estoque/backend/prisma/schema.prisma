@@ -1,0 +1,59 @@
+// Schema do Prisma para o Sistema de Estoque
+// Banco de dados: SQLite (conforme recomendação do material de apoio)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String      @id @default(cuid())
+  name      String
+  email     String      @unique
+  password  String
+  role      String      @default("viewer") // admin | manager | viewer
+  status    String      @default("active")  // active | inactive
+  createdAt DateTime    @default(now())
+
+  exits     StockExit[]
+}
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String
+  description String
+
+  products    Product[]
+}
+
+model Product {
+  id          String      @id @default(cuid())
+  name        String
+  sku         String      @unique
+  quantity    Int         @default(0)
+  minQuantity Int         @default(1)
+  price       Float       @default(0)
+  createdAt   DateTime    @default(now())
+
+  categoryId  String
+  category    Category    @relation(fields: [categoryId], references: [id])
+
+  exits       StockExit[]
+}
+
+model StockExit {
+  id          String   @id @default(cuid())
+  quantity    Int
+  reason      String
+  createdAt   DateTime @default(now())
+
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  createdById String?
+  createdBy   User?    @relation(fields: [createdById], references: [id])
+}
