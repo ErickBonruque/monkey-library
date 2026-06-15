@@ -3,7 +3,7 @@ package br.edu.utfpr.tds.api.resource;
 import br.edu.utfpr.tds.api.event.RecursoCriadoEvent;
 import br.edu.utfpr.tds.api.model.Usuario;
 import br.edu.utfpr.tds.api.repository.UsuarioRepository;
-import org.springframework.beans.BeanUtils;
+import br.edu.utfpr.tds.api.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
@@ -23,6 +23,9 @@ public class UsuarioResource {
     private UsuarioRepository usuarioRepository;
 
     @Autowired
+    private UsuarioService usuarioService;
+
+    @Autowired
     private ApplicationEventPublisher publisher;
 
     @GetMapping
@@ -38,19 +41,16 @@ public class UsuarioResource {
 
     @PostMapping
     public ResponseEntity<Usuario> criar(@Valid @RequestBody Usuario usuario, HttpServletResponse response) {
-        Usuario salvo = usuarioRepository.save(usuario);
+        Usuario salvo = usuarioService.cadastrar(usuario);
         publisher.publishEvent(new RecursoCriadoEvent(this, response, salvo.getId()));
         return ResponseEntity.status(HttpStatus.CREATED).body(salvo);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Usuario> atualizar(@PathVariable Long id, @Valid @RequestBody Usuario usuario) {
-        Optional<Usuario> existente = usuarioRepository.findById(id);
-        if (!existente.isPresent()) return ResponseEntity.notFound().build();
-
-        BeanUtils.copyProperties(usuario, existente.get(), "id", "dataCriacao");
-        Usuario atualizado = usuarioRepository.save(existente.get());
-        return ResponseEntity.ok(atualizado);
+        return usuarioService.atualizar(id, usuario)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @PatchMapping("/{id}/ativo")
