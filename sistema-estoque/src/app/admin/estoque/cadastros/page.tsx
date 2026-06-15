@@ -171,7 +171,7 @@ export default function CadastrosPage() {
         <TabsContent value="products">
           <div className="flex justify-end mb-3">
             <Dialog open={productOpen} onOpenChange={setProductOpen}>
-              <DialogTrigger><Button size="sm"><Plus className="h-4 w-4 mr-1" />Novo produto</Button></DialogTrigger>
+              <DialogTrigger render={<Button size="sm" />}><Plus className="h-4 w-4 mr-1" />Novo produto</DialogTrigger>
               <DialogContent>
                 <DialogHeader><DialogTitle>Novo Produto</DialogTitle></DialogHeader>
                 <ProductForm onSuccess={() => setProductOpen(false)} />
@@ -222,7 +222,7 @@ export default function CadastrosPage() {
         <TabsContent value="categories">
           <div className="flex justify-end mb-3">
             <Dialog open={categoryOpen} onOpenChange={setCategoryOpen}>
-              <DialogTrigger><Button size="sm"><Plus className="h-4 w-4 mr-1" />Nova categoria</Button></DialogTrigger>
+              <DialogTrigger render={<Button size="sm" />}><Plus className="h-4 w-4 mr-1" />Nova categoria</DialogTrigger>
               <DialogContent>
                 <DialogHeader><DialogTitle>Nova Categoria</DialogTitle></DialogHeader>
                 <CategoryForm onSuccess={() => setCategoryOpen(false)} />
