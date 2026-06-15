@@ -13,6 +13,7 @@ desenvolvido anteriormente.
 - **Zod** — validação das entradas
 - **@fastify/jwt** + **bcryptjs** — autenticação e hash de senhas
 - **@fastify/cors** — liberação de acesso para o front-end
+- **@fastify/swagger** + **swagger-ui** — documentação OpenAPI interativa em `/docs`
 - **dotenv** — variáveis de ambiente
 
 ## Como rodar
@@ -47,6 +48,20 @@ npm run dev
 | `PORT`        | Porta do servidor                           | `3333`                  |
 | `JWT_SECRET`  | Segredo para assinar os tokens JWT          | —                       |
 | `CORS_ORIGIN` | Origem permitida (front-end)                | `http://localhost:3000` |
+
+## Documentação interativa (Swagger)
+
+Com o servidor rodando, a documentação OpenAPI fica disponível em:
+
+```
+http://localhost:3333/docs
+```
+
+A especificação é gerada automaticamente a partir dos schemas Zod das rotas
+(via `@fastify/swagger` + `@fastify/swagger-ui` + `fastify-type-provider-zod`),
+então a doc nunca fica defasada em relação à validação. Para testar rotas
+protegidas na interface, faça login, clique em **Authorize** e cole o token JWT.
+O JSON da spec fica em `http://localhost:3333/docs/json`.
 
 ## Endpoints
 

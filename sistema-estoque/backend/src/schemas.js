@@ -2,6 +2,11 @@ import { z } from "zod"
 
 // Validações de entrada da API usando Zod (conforme material de apoio).
 
+// Parâmetro de rota :id (usado em PUT/DELETE).
+export const idParamSchema = z.object({
+  id: z.string().min(1, "ID é obrigatório"),
+})
+
 export const loginSchema = z.object({
   email: z.string().email("E-mail inválido"),
   password: z.string().min(6, "Senha deve ter no mínimo 6 caracteres"),
