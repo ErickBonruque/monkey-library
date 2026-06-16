@@ -1,6 +1,6 @@
 import { z } from "zod"
 
-// Validações de entrada da API usando Zod (conforme material de apoio).
+// Validações de entrada da API usando Zod
 
 // Parâmetro de rota :id (usado em PUT/DELETE).
 export const idParamSchema = z.object({
