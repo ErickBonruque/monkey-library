@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, useState, useCallback, type ReactNode } from "react"
+import { createContext, useState, useEffect, useCallback, type ReactNode } from "react"
 import type { AuthUser } from "@/types"
 import { authService } from "@/services/auth-service"
 
@@ -34,8 +34,18 @@ function loadStoredAuth(): { user: AuthUser | null; token: string | null } {
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [auth, setAuth] = useState(loadStoredAuth)
-  const isLoading = false
+  const [auth, setAuth] = useState<{ user: AuthUser | null; token: string | null }>({
+    user: null,
+    token: null,
+  })
+  // Starts true so the first client render matches the server (no user) and
+  // consumers can wait for hydration before deciding on auth-gated UI.
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    setAuth(loadStoredAuth())
+    setIsLoading(false)
+  }, [])
 
   const isAuthenticated = !!auth.user
 
