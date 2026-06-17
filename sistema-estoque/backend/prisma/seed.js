@@ -6,6 +6,7 @@ const prisma = new PrismaClient()
 
 async function main() {
   console.log("Limpando dados existentes...")
+  await prisma.stockEntry.deleteMany()
   await prisma.stockExit.deleteMany()
   await prisma.product.deleteMany()
   await prisma.category.deleteMany()
@@ -65,6 +66,13 @@ async function main() {
     prisma.stockExit.create({ data: { productId: papel.id, quantity: 5, reason: "Consumo administrativo", createdById: bruno.id } }),
     prisma.stockExit.create({ data: { productId: desinfetante.id, quantity: 3, reason: "Manutenção predial", createdById: ana.id } }),
     prisma.stockExit.create({ data: { productId: teclado.id, quantity: 1, reason: "Substituição por defeito", createdById: admin.id } }),
+  ])
+
+  console.log("Criando entradas de estoque...")
+  await Promise.all([
+    prisma.stockEntry.create({ data: { productId: notebook.id, quantity: 10, reason: "Compra do fornecedor Dell", createdById: ana.id } }),
+    prisma.stockEntry.create({ data: { productId: papel.id, quantity: 50, reason: "Reposição de material de escritório", createdById: bruno.id } }),
+    prisma.stockEntry.create({ data: { productId: teclado.id, quantity: 8, reason: "Compra para reposição de estoque", createdById: admin.id } }),
   ])
 
   console.log("Seed concluído com sucesso!")

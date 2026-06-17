@@ -14,8 +14,10 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
-lib64/
+# Restrito à raiz: eram regras do template Python que ignoravam
+# pastas src/lib/ de código (backend e frontend). Ver sistema-estoque/.
+/lib/
+/lib64/
 parts/
 sdist/
 var/

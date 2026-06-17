@@ -43,6 +43,12 @@ export const stockExitSchema = z.object({
   reason: z.string().min(5, "Motivo é obrigatório"),
 })
 
+export const stockEntrySchema = z.object({
+  productId: z.string().min(1, "Produto é obrigatório"),
+  quantity: z.coerce.number().min(1, "Quantidade deve ser pelo menos 1"),
+  reason: z.string().min(5, "Motivo é obrigatório"),
+})
+
 export const inviteSchema = z.object({
   email: z.string().email("E-mail inválido"),
   role: z.enum(["admin", "manager", "viewer"]),
@@ -54,4 +60,5 @@ export type ContactFormData = z.infer<typeof contactSchema>
 export type ProductFormData = z.infer<typeof productSchema>
 export type CategoryFormData = z.infer<typeof categorySchema>
 export type StockExitFormData = z.infer<typeof stockExitSchema>
+export type StockEntryFormData = z.infer<typeof stockEntrySchema>
 export type InviteFormData = z.infer<typeof inviteSchema>

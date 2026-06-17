@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation"
 
 const subNav = [
   { href: "/admin/estoque", label: "Visualização", end: true },
+  { href: "/admin/estoque/entradas", label: "Entradas" },
   { href: "/admin/estoque/baixas", label: "Baixas" },
   { href: "/admin/estoque/cadastros", label: "Cadastros" },
   { href: "/admin/estoque/metricas", label: "Métricas" },

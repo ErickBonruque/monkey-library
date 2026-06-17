@@ -20,6 +20,7 @@ model User {
   createdAt DateTime    @default(now())
 
   exits     StockExit[]
+  entries   StockEntry[]
 }
 
 model Category {
@@ -43,9 +44,24 @@ model Product {
   category    Category    @relation(fields: [categoryId], references: [id])
 
   exits       StockExit[]
+  entries     StockEntry[]
 }
 
 model StockExit {
+  id          String   @id @default(cuid())
+  quantity    Int
+  reason      String
+  createdAt   DateTime @default(now())
+
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  createdById String?
+  createdBy   User?    @relation(fields: [createdById], references: [id])
+}
+
+// Entrada (reposição) de estoque — espelha StockExit, mas soma ao saldo.
+model StockEntry {
   id          String   @id @default(cuid())
   quantity    Int
   reason      String

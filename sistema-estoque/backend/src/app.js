@@ -15,6 +15,7 @@ import { authRoutes } from "./routes/auth.routes.js"
 import { productRoutes } from "./routes/products.routes.js"
 import { categoryRoutes } from "./routes/categories.routes.js"
 import { exitRoutes } from "./routes/exits.routes.js"
+import { entryRoutes } from "./routes/entries.routes.js"
 import { kpiRoutes } from "./routes/kpis.routes.js"
 import { userRoutes } from "./routes/users.routes.js"
 
@@ -61,6 +62,7 @@ export function buildApp() {
         { name: "Products", description: "Produtos do estoque" },
         { name: "Categories", description: "Categorias de produtos" },
         { name: "Exits", description: "Baixas (saídas) de estoque" },
+        { name: "Entries", description: "Entradas (reposições) de estoque" },
         { name: "KPIs", description: "Métricas do dashboard" },
         { name: "Users", description: "Gestão de usuários" },
       ],
@@ -119,6 +121,7 @@ export function buildApp() {
   app.register(productRoutes, { prefix: "/api/products" })
   app.register(categoryRoutes, { prefix: "/api/categories" })
   app.register(exitRoutes, { prefix: "/api/exits" })
+  app.register(entryRoutes, { prefix: "/api/entries" })
   app.register(kpiRoutes, { prefix: "/api/kpis" })
   app.register(userRoutes, { prefix: "/api/users" })
 

@@ -1,5 +1,5 @@
 import { api } from "@/lib/api"
-import type { Product, Category, StockExit, KPIData } from "@/types"
+import type { Product, Category, StockExit, StockEntry, KPIData } from "@/types"
 
 export const estoqueService = {
   async getProducts(): Promise<Product[]> {
@@ -31,6 +31,10 @@ export const estoqueService = {
     return category
   },
 
+  async deleteCategory(id: string): Promise<void> {
+    await api.delete(`/categories/${id}`)
+  },
+
   async getExits(): Promise<StockExit[]> {
     const { data } = await api.get<StockExit[]>("/exits")
     return data
@@ -41,6 +45,18 @@ export const estoqueService = {
   ): Promise<StockExit> {
     const { data: exit } = await api.post<StockExit>("/exits", data)
     return exit
+  },
+
+  async getEntries(): Promise<StockEntry[]> {
+    const { data } = await api.get<StockEntry[]>("/entries")
+    return data
+  },
+
+  async registerEntry(
+    data: Omit<StockEntry, "id" | "createdAt" | "productName" | "createdBy">
+  ): Promise<StockEntry> {
+    const { data: entry } = await api.post<StockEntry>("/entries", data)
+    return entry
   },
 
   async getKPIs(): Promise<KPIData> {

@@ -5,6 +5,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { toast } from "sonner"
+import { isAxiosError } from "axios"
 import { Plus, Trash2 } from "lucide-react"
 import { Button } from "@/components/shadcn/button"
 import { Input } from "@/components/shadcn/input"
@@ -159,6 +160,21 @@ export default function CadastrosPage() {
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["products"] }); toast.success("Produto removido!") },
   })
 
+  const deleteCategory = useMutation({
+    mutationFn: (id: string) => estoqueService.deleteCategory(id),
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["categories"] }); toast.success("Categoria removida!") },
+    onError: (error) => {
+      const message = isAxiosError(error) ? error.response?.data?.message : undefined
+      toast.error(message ?? "Não foi possível remover a categoria.")
+    },
+  })
+
+  // Quantos produtos cada categoria possui (regra: só remove categoria vazia).
+  const productCountByCategory = (products ?? []).reduce<Record<string, number>>((acc, p) => {
+    acc[p.categoryId] = (acc[p.categoryId] ?? 0) + 1
+    return acc
+  }, {})
+
   return (
     <div>
       <PageHeader title="Cadastros" description="Gerencie produtos e categorias." />
@@ -236,22 +252,39 @@ export default function CadastrosPage() {
                 <TableRow>
                   <TableHead>Nome</TableHead>
                   <TableHead>Descrição</TableHead>
+                  <TableHead>Produtos</TableHead>
+                  <TableHead className="w-10"></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {loadingCategories ? (
                   Array.from({ length: 4 }).map((_, i) => (
-                    <TableRow key={i}>{Array.from({ length: 2 }).map((_, j) => <TableCell key={j}><Skeleton className="h-4 w-full" /></TableCell>)}</TableRow>
+                    <TableRow key={i}>{Array.from({ length: 4 }).map((_, j) => <TableCell key={j}><Skeleton className="h-4 w-full" /></TableCell>)}</TableRow>
                   ))
                 ) : (categories ?? []).length === 0 ? (
-                  <TableRow><TableCell colSpan={2}><EmptyState title="Nenhuma categoria cadastrada" /></TableCell></TableRow>
+                  <TableRow><TableCell colSpan={4}><EmptyState title="Nenhuma categoria cadastrada" /></TableCell></TableRow>
                 ) : (
-                  (categories ?? []).map((c) => (
-                    <TableRow key={c.id}>
-                      <TableCell className="font-medium">{c.name}</TableCell>
-                      <TableCell>{c.description}</TableCell>
-                    </TableRow>
-                  ))
+                  (categories ?? []).map((c) => {
+                    const count = productCountByCategory[c.id] ?? 0
+                    return (
+                      <TableRow key={c.id}>
+                        <TableCell className="font-medium">{c.name}</TableCell>
+                        <TableCell>{c.description}</TableCell>
+                        <TableCell>{count}</TableCell>
+                        <TableCell>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            disabled={count > 0 || deleteCategory.isPending}
+                            title={count > 0 ? "Remova ou mova os produtos antes de excluir a categoria" : "Excluir categoria"}
+                            onClick={() => deleteCategory.mutate(c.id)}
+                          >
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })
                 )}
               </TableBody>
             </Table>

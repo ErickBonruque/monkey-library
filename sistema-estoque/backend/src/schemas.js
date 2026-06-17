@@ -41,6 +41,12 @@ export const exitCreateSchema = z.object({
   reason: z.string().min(5, "Motivo é obrigatório"),
 })
 
+export const entryCreateSchema = z.object({
+  productId: z.string().min(1, "Produto é obrigatório"),
+  quantity: z.coerce.number().int().min(1, "Quantidade deve ser pelo menos 1"),
+  reason: z.string().min(5, "Motivo é obrigatório"),
+})
+
 export const userUpdateSchema = z
   .object({
     name: z.string().min(2).optional(),

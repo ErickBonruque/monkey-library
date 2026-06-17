@@ -42,6 +42,16 @@ export interface StockExit {
   createdBy: string
 }
 
+export interface StockEntry {
+  id: string
+  productId: string
+  productName: string
+  quantity: number
+  reason: string
+  createdAt: string
+  createdBy: string
+}
+
 export interface KPIData {
   totalProducts: number
   lowStockCount: number
