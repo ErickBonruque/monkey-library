@@ -1,4 +1,5 @@
 import { Package2 } from "lucide-react"
+import { Badge } from "@/components/shadcn/badge"
 
 export default function SobrePage() {
   return (
@@ -45,6 +46,60 @@ export default function SobrePage() {
             <li><strong className="text-foreground">JWT</strong> — Autenticação por token nas rotas protegidas</li>
             <li><strong className="text-foreground">bcrypt</strong> — Criptografia (hash) das senhas dos usuários</li>
             <li><strong className="text-foreground">Swagger</strong> — Documentação interativa da API gerada automaticamente</li>
+          </ul>
+
+          <h2 className="text-xl font-semibold text-foreground">Rotas da API</h2>
+          <p className="text-sm">
+            As rotas <strong className="text-foreground">públicas</strong> podem ser acessadas sem login.
+            As <strong className="text-foreground">privadas</strong> exigem um token JWT
+            (header <code className="text-foreground">Authorization: Bearer &lt;token&gt;</code>),
+            obtido no login. Documentação completa em <code className="text-foreground">/docs</code> (Swagger).
+          </p>
+
+          <h3 className="font-semibold text-foreground">Autenticação</h3>
+          <ul className="list-disc list-inside space-y-1 text-sm">
+            <li><Badge variant="default">Pública</Badge> <code className="text-foreground">POST /api/auth/login</code> — autentica o usuário e retorna o token JWT</li>
+            <li><Badge variant="default">Pública</Badge> <code className="text-foreground">POST /api/auth/register</code> — cadastra um novo usuário e retorna o token</li>
+          </ul>
+
+          <h3 className="font-semibold text-foreground">Produtos</h3>
+          <ul className="list-disc list-inside space-y-1 text-sm">
+            <li><Badge variant="default">Pública</Badge> <code className="text-foreground">GET /api/products</code> — lista todos os produtos</li>
+            <li><Badge variant="secondary">Privada</Badge> <code className="text-foreground">POST /api/products</code> — cria um produto</li>
+            <li><Badge variant="secondary">Privada</Badge> <code className="text-foreground">PUT /api/products/:id</code> — atualiza um produto</li>
+            <li><Badge variant="secondary">Privada</Badge> <code className="text-foreground">DELETE /api/products/:id</code> — remove um produto</li>
+          </ul>
+
+          <h3 className="font-semibold text-foreground">Categorias</h3>
+          <ul className="list-disc list-inside space-y-1 text-sm">
+            <li><Badge variant="default">Pública</Badge> <code className="text-foreground">GET /api/categories</code> — lista todas as categorias</li>
+            <li><Badge variant="secondary">Privada</Badge> <code className="text-foreground">POST /api/categories</code> — cria uma categoria</li>
+            <li><Badge variant="secondary">Privada</Badge> <code className="text-foreground">DELETE /api/categories/:id</code> — remove uma categoria (apenas se não tiver produtos)</li>
+          </ul>
+
+          <h3 className="font-semibold text-foreground">Entradas (reposição de estoque)</h3>
+          <ul className="list-disc list-inside space-y-1 text-sm">
+            <li><Badge variant="secondary">Privada</Badge> <code className="text-foreground">GET /api/entries</code> — lista o histórico de entradas</li>
+            <li><Badge variant="secondary">Privada</Badge> <code className="text-foreground">POST /api/entries</code> — registra uma entrada e soma ao estoque</li>
+          </ul>
+
+          <h3 className="font-semibold text-foreground">Baixas (saída de estoque)</h3>
+          <ul className="list-disc list-inside space-y-1 text-sm">
+            <li><Badge variant="secondary">Privada</Badge> <code className="text-foreground">GET /api/exits</code> — lista o histórico de baixas</li>
+            <li><Badge variant="secondary">Privada</Badge> <code className="text-foreground">POST /api/exits</code> — registra uma baixa e abate do estoque</li>
+          </ul>
+
+          <h3 className="font-semibold text-foreground">Métricas</h3>
+          <ul className="list-disc list-inside space-y-1 text-sm">
+            <li><Badge variant="secondary">Privada</Badge> <code className="text-foreground">GET /api/kpis</code> — métricas do dashboard (totais, estoque baixo, valor)</li>
+            <li><Badge variant="default">Pública</Badge> <code className="text-foreground">GET /api/health</code> — verificação de saúde da API</li>
+          </ul>
+
+          <h3 className="font-semibold text-foreground">Usuários</h3>
+          <ul className="list-disc list-inside space-y-1 text-sm">
+            <li><Badge variant="secondary">Privada</Badge> <code className="text-foreground">GET /api/users</code> — lista os usuários</li>
+            <li><Badge variant="secondary">Privada</Badge> <code className="text-foreground">PUT /api/users/:id</code> — atualiza um usuário</li>
+            <li><Badge variant="secondary">Privada</Badge> <code className="text-foreground">POST /api/users/invite</code> — convida (cadastra) um usuário com senha temporária</li>
           </ul>
         </div>
       </div>
