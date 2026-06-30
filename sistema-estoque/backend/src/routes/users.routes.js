@@ -4,8 +4,10 @@ import { userUpdateSchema, inviteSchema, idParamSchema } from "../schemas.js"
 import { serializeUser } from "../lib/serializers.js"
 
 export async function userRoutes(app) {
-  // Todas as rotas de usuários são protegidas.
+  // Todas as rotas de usuários são protegidas e restritas a administradores:
+  // a gestão de usuários é uma operação de governança sensível.
   app.addHook("onRequest", app.authenticate)
+  app.addHook("onRequest", app.authorize(["admin"]))
 
   // GET /api/users
   app.get(

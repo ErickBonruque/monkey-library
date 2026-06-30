@@ -8,6 +8,8 @@ export async function authRoutes(app) {
   app.post(
     "/login",
     {
+      // Limite reforçado: protege contra tentativas de força bruta no login.
+      config: { rateLimit: { max: 5, timeWindow: "1 minute" } },
       schema: {
         tags: ["Auth"],
         summary: "Autentica o usuário e retorna o token JWT",

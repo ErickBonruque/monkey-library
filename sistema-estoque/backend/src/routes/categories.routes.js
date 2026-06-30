@@ -13,11 +13,11 @@ export async function categoryRoutes(app) {
     }
   )
 
-  // POST /api/categories  (protegido)
+  // POST /api/categories  (protegido — admin ou manager)
   app.post(
     "/",
     {
-      onRequest: [app.authenticate],
+      onRequest: [app.authenticate, app.authorize(["admin", "manager"])],
       schema: {
         tags: ["Categories"],
         summary: "Cria uma categoria",
@@ -32,11 +32,11 @@ export async function categoryRoutes(app) {
     }
   )
 
-  // DELETE /api/categories/:id  (protegido) — só remove se não houver produtos
+  // DELETE /api/categories/:id  (protegido — admin ou manager) — só remove se não houver produtos
   app.delete(
     "/:id",
     {
-      onRequest: [app.authenticate],
+      onRequest: [app.authenticate, app.authorize(["admin", "manager"])],
       schema: {
         tags: ["Categories"],
         summary: "Remove uma categoria (apenas se não tiver produtos)",

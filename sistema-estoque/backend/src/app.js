@@ -1,6 +1,7 @@
 import Fastify from "fastify"
 import cors from "@fastify/cors"
 import jwt from "@fastify/jwt"
+import rateLimit from "@fastify/rate-limit"
 import swagger from "@fastify/swagger"
 import swaggerUI from "@fastify/swagger-ui"
 import { ZodError } from "zod"
@@ -20,6 +21,16 @@ import { kpiRoutes } from "./routes/kpis.routes.js"
 import { userRoutes } from "./routes/users.routes.js"
 
 export function buildApp() {
+  // Configuração segura da autenticação: o segredo do JWT é obrigatório e
+  // precisa ter um tamanho mínimo. Sem isso a aplicação não sobe — evita que
+  // um ambiente de produção rode com um segredo fraco ou previsível.
+  const jwtSecret = process.env.JWT_SECRET
+  if (!jwtSecret || jwtSecret.length < 16) {
+    throw new Error(
+      "JWT_SECRET ausente ou muito curto. Defina um segredo forte (mínimo 16 caracteres) na variável de ambiente JWT_SECRET."
+    )
+  }
+
   const app = Fastify({ logger: true })
 
   // Integra o Zod ao ciclo de validação/serialização do Fastify. Assim os
@@ -34,7 +45,19 @@ export function buildApp() {
 
   // Autenticação via JWT.
   app.register(jwt, {
-    secret: process.env.JWT_SECRET || "fallback-secret",
+    secret: jwtSecret,
+  })
+
+  // Limitação de requisições (proteção contra brute-force e abuso). O limite
+  // padrão vale para toda a API; rotas sensíveis (ex.: login) reforçam o seu.
+  app.register(rateLimit, {
+    global: true,
+    max: 100,
+    timeWindow: "1 minute",
+    errorResponseBuilder: () => ({
+      statusCode: 429,
+      message: "Muitas requisições. Tente novamente em instantes.",
+    }),
   })
 
   // Documentação OpenAPI gerada a partir dos schemas Zod das rotas.
@@ -82,6 +105,16 @@ export function buildApp() {
       await request.jwtVerify()
     } catch {
       return reply.status(401).send({ message: "Não autorizado" })
+    }
+  })
+
+  // Decorator de autorização por papel: aplica os níveis de acesso. Deve ser
+  // usado em conjunto com `authenticate` (que popula request.user a partir do
+  // token). Retorna 403 quando o papel do usuário não está na lista permitida.
+  app.decorate("authorize", (roles) => async (request, reply) => {
+    const userRole = request.user?.role
+    if (!userRole || !roles.includes(userRole)) {
+      return reply.status(403).send({ message: "Acesso negado" })
     }
   })
 

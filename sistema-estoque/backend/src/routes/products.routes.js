@@ -16,11 +16,11 @@ export async function productRoutes(app) {
     }
   )
 
-  // POST /api/products  (protegido)
+  // POST /api/products  (protegido — admin ou manager)
   app.post(
     "/",
     {
-      onRequest: [app.authenticate],
+      onRequest: [app.authenticate, app.authorize(["admin", "manager"])],
       schema: {
         tags: ["Products"],
         summary: "Cria um produto",
@@ -44,11 +44,11 @@ export async function productRoutes(app) {
     }
   )
 
-  // PUT /api/products/:id  (protegido)
+  // PUT /api/products/:id  (protegido — admin ou manager)
   app.put(
     "/:id",
     {
-      onRequest: [app.authenticate],
+      onRequest: [app.authenticate, app.authorize(["admin", "manager"])],
       schema: {
         tags: ["Products"],
         summary: "Atualiza um produto",
@@ -82,11 +82,11 @@ export async function productRoutes(app) {
     }
   )
 
-  // DELETE /api/products/:id  (protegido)
+  // DELETE /api/products/:id  (protegido — admin ou manager)
   app.delete(
     "/:id",
     {
-      onRequest: [app.authenticate],
+      onRequest: [app.authenticate, app.authorize(["admin", "manager"])],
       schema: {
         tags: ["Products"],
         summary: "Remove um produto",
