@@ -9,6 +9,7 @@ const subNav = [
   { href: "/admin/estoque/baixas", label: "Baixas" },
   { href: "/admin/estoque/cadastros", label: "Cadastros" },
   { href: "/admin/estoque/metricas", label: "Métricas" },
+  { href: "/admin/estoque/financeiro", label: "Financeiro" },
   { href: "/admin/estoque/relatorios", label: "Relatórios" },
 ]
 

@@ -8,7 +8,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Skeleton } from "@/components/shadcn/skeleton"
 import { PageHeader } from "@/components/shared/page-header"
 import { estoqueService } from "@/services/estoque-service"
-import { mockExitsByMonth, mockProductsByCategory } from "@/mocks"
 import {
   Bar,
   BarChart,
@@ -38,13 +37,17 @@ export default function DashboardPage() {
     queryKey: ["kpis"],
     queryFn: () => estoqueService.getKPIs(),
   })
+  const { data: charts } = useQuery({
+    queryKey: ["charts"],
+    queryFn: () => estoqueService.getCharts(),
+  })
 
   const kpiCards = [
     { label: "Total de Produtos", value: kpis?.totalProducts ?? 0, icon: Package, color: "text-blue-600" },
     { label: "Estoque Baixo", value: kpis?.lowStockCount ?? 0, icon: AlertTriangle, color: "text-amber-600" },
     { label: "Baixas no Mês", value: kpis?.exitsThisMonth ?? 0, icon: TrendingDown, color: "text-red-600" },
     {
-      label: "Valor Total",
+      label: "Valor do Estoque",
       value: kpis ? `R$ ${kpis.totalValue.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}` : "—",
       icon: DollarSign,
       color: "text-green-600",
@@ -83,7 +86,7 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <ChartContainer config={exitsChartConfig} className="min-h-[220px] w-full">
-              <LineChart data={mockExitsByMonth} accessibilityLayer>
+              <LineChart data={charts?.movementsByMonth ?? []} accessibilityLayer>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="month" tick={{ fontSize: 12 }} />
                 <YAxis tick={{ fontSize: 12 }} />
@@ -100,7 +103,7 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <ChartContainer config={categoriesChartConfig} className="min-h-[220px] w-full">
-              <BarChart data={mockProductsByCategory} accessibilityLayer>
+              <BarChart data={charts?.productsByCategory ?? []} accessibilityLayer>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="categoria" tick={{ fontSize: 11 }} />
                 <YAxis tick={{ fontSize: 12 }} />

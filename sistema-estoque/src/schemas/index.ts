@@ -46,12 +46,36 @@ export const stockExitSchema = z.object({
 export const stockEntrySchema = z.object({
   productId: z.string().min(1, "Produto é obrigatório"),
   quantity: z.coerce.number().min(1, "Quantidade deve ser pelo menos 1"),
+  unitCost: z.coerce.number().min(0, "Custo não pode ser negativo"),
   reason: z.string().min(5, "Motivo é obrigatório"),
 })
 
 export const inviteSchema = z.object({
   email: z.string().email("E-mail inválido"),
   role: z.enum(["admin", "manager", "viewer"]),
+})
+
+export const acceptInviteSchema = z
+  .object({
+    name: z.string().min(2, "Nome deve ter no mínimo 2 caracteres"),
+    password: z.string().min(6, "Senha deve ter no mínimo 6 caracteres"),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "As senhas não coincidem",
+    path: ["confirmPassword"],
+  })
+
+export const purchaseItemSchema = z.object({
+  productId: z.string().min(1, "Produto é obrigatório"),
+  quantity: z.coerce.number().min(1, "Quantidade deve ser pelo menos 1"),
+  unitCost: z.coerce.number().min(0, "Custo não pode ser negativo"),
+})
+
+export const purchaseSchema = z.object({
+  supplier: z.string().min(2, "Fornecedor é obrigatório"),
+  notes: z.string().optional(),
+  items: z.array(purchaseItemSchema).min(1, "Inclua ao menos um item"),
 })
 
 export type LoginFormData = z.infer<typeof loginSchema>
@@ -62,3 +86,5 @@ export type CategoryFormData = z.infer<typeof categorySchema>
 export type StockExitFormData = z.infer<typeof stockExitSchema>
 export type StockEntryFormData = z.infer<typeof stockEntrySchema>
 export type InviteFormData = z.infer<typeof inviteSchema>
+export type AcceptInviteFormData = z.infer<typeof acceptInviteSchema>
+export type PurchaseFormData = z.infer<typeof purchaseSchema>

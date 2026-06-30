@@ -53,6 +53,7 @@ export function serializeExit(exit) {
     productName: exit.product?.name ?? "",
     quantity: exit.quantity,
     reason: exit.reason,
+    totalCost: exit.totalCost ?? 0,
     createdAt: exit.createdAt.toISOString(),
     createdBy: exit.createdBy?.name ?? "Sistema",
   }
@@ -66,7 +67,48 @@ export function serializeEntry(entry) {
     productName: entry.product?.name ?? "",
     quantity: entry.quantity,
     reason: entry.reason,
+    unitCost: entry.unitCost ?? 0,
     createdAt: entry.createdAt.toISOString(),
     createdBy: entry.createdBy?.name ?? "Sistema",
+  }
+}
+
+// Convite de usuário. O token não é exposto na listagem administrativa.
+export function serializeInvite(invite) {
+  return {
+    id: invite.id,
+    email: invite.email,
+    role: invite.role,
+    status: invite.status,
+    expiresAt: invite.expiresAt.toISOString(),
+    createdAt: invite.createdAt.toISOString(),
+    acceptedAt: invite.acceptedAt ? invite.acceptedAt.toISOString() : null,
+    invitedBy: invite.invitedBy?.name ?? "Sistema",
+  }
+}
+
+// Espera uma compra com items (e cada item com product) e usuários incluídos.
+export function serializePurchaseOrder(order) {
+  const items = (order.items ?? []).map((item) => ({
+    id: item.id,
+    productId: item.productId,
+    productName: item.product?.name ?? "",
+    quantity: item.quantity,
+    unitCost: item.unitCost,
+    subtotal: item.quantity * item.unitCost,
+  }))
+  return {
+    id: order.id,
+    supplier: order.supplier,
+    status: order.status,
+    notes: order.notes ?? "",
+    total: items.reduce((sum, i) => sum + i.subtotal, 0),
+    itemsCount: items.length,
+    items,
+    createdBy: order.createdBy?.name ?? "Sistema",
+    approvedBy: order.approvedBy?.name ?? null,
+    createdAt: order.createdAt.toISOString(),
+    approvedAt: order.approvedAt ? order.approvedAt.toISOString() : null,
+    receivedAt: order.receivedAt ? order.receivedAt.toISOString() : null,
   }
 }

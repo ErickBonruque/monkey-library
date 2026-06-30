@@ -26,6 +26,8 @@ import { PageHeader } from "@/components/shared/page-header"
 import { EmptyState } from "@/components/shared/empty-state"
 import { productSchema, categorySchema, type ProductFormData, type CategoryFormData } from "@/schemas"
 import { estoqueService } from "@/services/estoque-service"
+import { useAuth } from "@/hooks/use-auth"
+import { canManageStock } from "@/lib/permissions"
 
 function ProductForm({ onSuccess }: { onSuccess: () => void }) {
   const { data: categories } = useQuery({ queryKey: ["categories"], queryFn: () => estoqueService.getCategories() })
@@ -148,6 +150,8 @@ function CategoryForm({ onSuccess }: { onSuccess: () => void }) {
 }
 
 export default function CadastrosPage() {
+  const { user } = useAuth()
+  const canManage = canManageStock(user?.role)
   const [productOpen, setProductOpen] = useState(false)
   const [categoryOpen, setCategoryOpen] = useState(false)
 
@@ -185,15 +189,17 @@ export default function CadastrosPage() {
         </TabsList>
 
         <TabsContent value="products">
-          <div className="flex justify-end mb-3">
-            <Dialog open={productOpen} onOpenChange={setProductOpen}>
-              <DialogTrigger render={<Button size="sm" />}><Plus className="h-4 w-4 mr-1" />Novo produto</DialogTrigger>
-              <DialogContent>
-                <DialogHeader><DialogTitle>Novo Produto</DialogTitle></DialogHeader>
-                <ProductForm onSuccess={() => setProductOpen(false)} />
-              </DialogContent>
-            </Dialog>
-          </div>
+          {canManage && (
+            <div className="flex justify-end mb-3">
+              <Dialog open={productOpen} onOpenChange={setProductOpen}>
+                <DialogTrigger render={<Button size="sm" />}><Plus className="h-4 w-4 mr-1" />Novo produto</DialogTrigger>
+                <DialogContent>
+                  <DialogHeader><DialogTitle>Novo Produto</DialogTitle></DialogHeader>
+                  <ProductForm onSuccess={() => setProductOpen(false)} />
+                </DialogContent>
+              </Dialog>
+            </div>
+          )}
 
           <div className="rounded-md border">
             <Table>
@@ -225,7 +231,9 @@ export default function CadastrosPage() {
                       </TableCell>
                       <TableCell>R$ {p.price.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</TableCell>
                       <TableCell>
-                        <Button variant="ghost" size="icon" onClick={() => deleteProduct.mutate(p.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                        {canManage && (
+                          <Button variant="ghost" size="icon" onClick={() => deleteProduct.mutate(p.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                        )}
                       </TableCell>
                     </TableRow>
                   ))
@@ -236,6 +244,7 @@ export default function CadastrosPage() {
         </TabsContent>
 
         <TabsContent value="categories">
+          {canManage && (
           <div className="flex justify-end mb-3">
             <Dialog open={categoryOpen} onOpenChange={setCategoryOpen}>
               <DialogTrigger render={<Button size="sm" />}><Plus className="h-4 w-4 mr-1" />Nova categoria</DialogTrigger>
@@ -245,6 +254,7 @@ export default function CadastrosPage() {
               </DialogContent>
             </Dialog>
           </div>
+          )}
 
           <div className="rounded-md border">
             <Table>
@@ -272,15 +282,17 @@ export default function CadastrosPage() {
                         <TableCell>{c.description}</TableCell>
                         <TableCell>{count}</TableCell>
                         <TableCell>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            disabled={count > 0 || deleteCategory.isPending}
-                            title={count > 0 ? "Remova ou mova os produtos antes de excluir a categoria" : "Excluir categoria"}
-                            onClick={() => deleteCategory.mutate(c.id)}
-                          >
-                            <Trash2 className="h-4 w-4 text-destructive" />
-                          </Button>
+                          {canManage && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              disabled={count > 0 || deleteCategory.isPending}
+                              title={count > 0 ? "Remova ou mova os produtos antes de excluir a categoria" : "Excluir categoria"}
+                              onClick={() => deleteCategory.mutate(c.id)}
+                            >
+                              <Trash2 className="h-4 w-4 text-destructive" />
+                            </Button>
+                          )}
                         </TableCell>
                       </TableRow>
                     )

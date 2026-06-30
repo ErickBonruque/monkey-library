@@ -44,6 +44,7 @@ export const exitCreateSchema = z.object({
 export const entryCreateSchema = z.object({
   productId: z.string().min(1, "Produto é obrigatório"),
   quantity: z.coerce.number().int().min(1, "Quantidade deve ser pelo menos 1"),
+  unitCost: z.coerce.number().min(0, "Custo não pode ser negativo"),
   reason: z.string().min(5, "Motivo é obrigatório"),
 })
 
@@ -58,4 +59,30 @@ export const userUpdateSchema = z
 export const inviteSchema = z.object({
   email: z.string().email("E-mail inválido"),
   role: z.enum(["admin", "manager", "viewer"]),
+})
+
+// Parâmetro de rota :token (convites).
+export const tokenParamSchema = z.object({
+  token: z.string().min(1, "Token é obrigatório"),
+})
+
+// Aceite de convite: o usuário define nome e senha; e-mail e papel vêm do convite.
+export const acceptInviteSchema = z.object({
+  name: z.string().min(2, "Nome deve ter no mínimo 2 caracteres"),
+  password: z.string().min(6, "Senha deve ter no mínimo 6 caracteres"),
+})
+
+// Criação de uma solicitação de compra com seus itens.
+export const purchaseCreateSchema = z.object({
+  supplier: z.string().min(2, "Fornecedor é obrigatório"),
+  notes: z.string().optional(),
+  items: z
+    .array(
+      z.object({
+        productId: z.string().min(1, "Produto é obrigatório"),
+        quantity: z.coerce.number().int().min(1, "Quantidade deve ser pelo menos 1"),
+        unitCost: z.coerce.number().min(0, "Custo não pode ser negativo"),
+      })
+    )
+    .min(1, "Inclua ao menos um item"),
 })

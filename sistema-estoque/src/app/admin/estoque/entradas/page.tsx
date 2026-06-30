@@ -24,9 +24,13 @@ import { Skeleton } from "@/components/shadcn/skeleton"
 import { PageHeader } from "@/components/shared/page-header"
 import { stockEntrySchema, type StockEntryFormData } from "@/schemas"
 import { estoqueService } from "@/services/estoque-service"
+import { useAuth } from "@/hooks/use-auth"
+import { canManageStock } from "@/lib/permissions"
 
 export default function EntradasPage() {
   const queryClient = useQueryClient()
+  const { user } = useAuth()
+  const canManage = canManageStock(user?.role)
   const [selectedProduct, setSelectedProduct] = useState("")
 
   const { data: products } = useQuery({ queryKey: ["products"], queryFn: () => estoqueService.getProducts() })
@@ -47,7 +51,7 @@ export default function EntradasPage() {
     formState: { isSubmitting },
   } = useForm<StockEntryFormData>({
     resolver: zodResolver(stockEntrySchema) as never,
-    defaultValues: { productId: "", quantity: 1, reason: "" },
+    defaultValues: { productId: "", quantity: 1, unitCost: 0, reason: "" },
   })
 
   async function onSubmit(data: StockEntryFormData) {
@@ -61,6 +65,7 @@ export default function EntradasPage() {
     <div className="space-y-6">
       <PageHeader title="Entradas de Estoque" description="Registre reposições de produtos." />
 
+      {canManage && (
       <Card className="max-w-xl">
         <CardHeader><CardTitle className="text-base">Nova entrada</CardTitle></CardHeader>
         <CardContent>
@@ -86,17 +91,31 @@ export default function EntradasPage() {
               )}
             />
 
-            <Controller
-              name="quantity"
-              control={control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor={field.name}>Quantidade</FieldLabel>
-                  <Input {...field} id={field.name} type="number" min={1} aria-invalid={fieldState.invalid} />
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                </Field>
-              )}
-            />
+            <div className="grid grid-cols-2 gap-4">
+              <Controller
+                name="quantity"
+                control={control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor={field.name}>Quantidade</FieldLabel>
+                    <Input {...field} id={field.name} type="number" min={1} aria-invalid={fieldState.invalid} />
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                  </Field>
+                )}
+              />
+
+              <Controller
+                name="unitCost"
+                control={control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor={field.name}>Custo unitário (R$)</FieldLabel>
+                    <Input {...field} id={field.name} type="number" min={0} step="0.01" aria-invalid={fieldState.invalid} />
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                  </Field>
+                )}
+              />
+            </div>
 
             <Controller
               name="reason"
@@ -116,6 +135,7 @@ export default function EntradasPage() {
           </form>
         </CardContent>
       </Card>
+      )}
 
       <div>
         <h2 className="text-lg font-semibold mb-3">Histórico de Entradas</h2>
@@ -125,6 +145,7 @@ export default function EntradasPage() {
               <TableRow>
                 <TableHead>Produto</TableHead>
                 <TableHead>Qtd.</TableHead>
+                <TableHead>Custo unit.</TableHead>
                 <TableHead>Motivo</TableHead>
                 <TableHead>Responsável</TableHead>
                 <TableHead>Data</TableHead>
@@ -134,18 +155,19 @@ export default function EntradasPage() {
               {isLoading ? (
                 Array.from({ length: 4 }).map((_, i) => (
                   <TableRow key={i}>
-                    {Array.from({ length: 5 }).map((_, j) => (
+                    {Array.from({ length: 6 }).map((_, j) => (
                       <TableCell key={j}><Skeleton className="h-4 w-full" /></TableCell>
                     ))}
                   </TableRow>
                 ))
               ) : (entries ?? []).length === 0 ? (
-                <TableRow><TableCell colSpan={5}><p className="text-center py-8 text-muted-foreground">Nenhuma entrada registrada.</p></TableCell></TableRow>
+                <TableRow><TableCell colSpan={6}><p className="text-center py-8 text-muted-foreground">Nenhuma entrada registrada.</p></TableCell></TableRow>
               ) : (
                 (entries ?? []).map((e) => (
                   <TableRow key={e.id}>
                     <TableCell className="font-medium">{e.productName}</TableCell>
                     <TableCell>{e.quantity}</TableCell>
+                    <TableCell>R$ {e.unitCost.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</TableCell>
                     <TableCell>{e.reason}</TableCell>
                     <TableCell>{e.createdBy}</TableCell>
                     <TableCell className="text-muted-foreground text-sm">

@@ -1,5 +1,14 @@
 import { api } from "@/lib/api"
-import type { Product, Category, StockExit, StockEntry, KPIData } from "@/types"
+import type {
+  Product,
+  Category,
+  StockExit,
+  StockEntry,
+  KPIData,
+  ChartsData,
+  FinancialData,
+  ReorderAlert,
+} from "@/types"
 
 export const estoqueService = {
   async getProducts(): Promise<Product[]> {
@@ -40,9 +49,12 @@ export const estoqueService = {
     return data
   },
 
-  async registerExit(
-    data: Omit<StockExit, "id" | "createdAt" | "productName" | "createdBy">
-  ): Promise<StockExit> {
+  // O custo (totalCost) é apurado no servidor a partir dos lotes (FIFO).
+  async registerExit(data: {
+    productId: string
+    quantity: number
+    reason: string
+  }): Promise<StockExit> {
     const { data: exit } = await api.post<StockExit>("/exits", data)
     return exit
   },
@@ -52,15 +64,33 @@ export const estoqueService = {
     return data
   },
 
-  async registerEntry(
-    data: Omit<StockEntry, "id" | "createdAt" | "productName" | "createdBy">
-  ): Promise<StockEntry> {
+  async registerEntry(data: {
+    productId: string
+    quantity: number
+    unitCost: number
+    reason: string
+  }): Promise<StockEntry> {
     const { data: entry } = await api.post<StockEntry>("/entries", data)
     return entry
   },
 
   async getKPIs(): Promise<KPIData> {
     const { data } = await api.get<KPIData>("/kpis")
+    return data
+  },
+
+  async getCharts(): Promise<ChartsData> {
+    const { data } = await api.get<ChartsData>("/kpis/charts")
+    return data
+  },
+
+  async getFinancial(): Promise<FinancialData> {
+    const { data } = await api.get<FinancialData>("/kpis/financial")
+    return data
+  },
+
+  async getAlerts(): Promise<ReorderAlert[]> {
+    const { data } = await api.get<ReorderAlert[]>("/kpis/alerts")
     return data
   },
 }

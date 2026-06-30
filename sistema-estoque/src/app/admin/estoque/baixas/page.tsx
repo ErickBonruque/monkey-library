@@ -24,9 +24,13 @@ import { Skeleton } from "@/components/shadcn/skeleton"
 import { PageHeader } from "@/components/shared/page-header"
 import { stockExitSchema, type StockExitFormData } from "@/schemas"
 import { estoqueService } from "@/services/estoque-service"
+import { useAuth } from "@/hooks/use-auth"
+import { canManageStock } from "@/lib/permissions"
 
 export default function BaixasPage() {
   const queryClient = useQueryClient()
+  const { user } = useAuth()
+  const canManage = canManageStock(user?.role)
   const [selectedProduct, setSelectedProduct] = useState("")
 
   const { data: products } = useQuery({ queryKey: ["products"], queryFn: () => estoqueService.getProducts() })
@@ -61,6 +65,7 @@ export default function BaixasPage() {
     <div className="space-y-6">
       <PageHeader title="Baixas de Estoque" description="Registre saídas de produtos." />
 
+      {canManage && (
       <Card className="max-w-xl">
         <CardHeader><CardTitle className="text-base">Nova baixa</CardTitle></CardHeader>
         <CardContent>
@@ -116,6 +121,7 @@ export default function BaixasPage() {
           </form>
         </CardContent>
       </Card>
+      )}
 
       <div>
         <h2 className="text-lg font-semibold mb-3">Histórico de Baixas</h2>
@@ -125,6 +131,7 @@ export default function BaixasPage() {
               <TableRow>
                 <TableHead>Produto</TableHead>
                 <TableHead>Qtd.</TableHead>
+                <TableHead>Custo (CMV)</TableHead>
                 <TableHead>Motivo</TableHead>
                 <TableHead>Responsável</TableHead>
                 <TableHead>Data</TableHead>
@@ -134,18 +141,19 @@ export default function BaixasPage() {
               {isLoading ? (
                 Array.from({ length: 4 }).map((_, i) => (
                   <TableRow key={i}>
-                    {Array.from({ length: 5 }).map((_, j) => (
+                    {Array.from({ length: 6 }).map((_, j) => (
                       <TableCell key={j}><Skeleton className="h-4 w-full" /></TableCell>
                     ))}
                   </TableRow>
                 ))
               ) : (exits ?? []).length === 0 ? (
-                <TableRow><TableCell colSpan={5}><p className="text-center py-8 text-muted-foreground">Nenhuma baixa registrada.</p></TableCell></TableRow>
+                <TableRow><TableCell colSpan={6}><p className="text-center py-8 text-muted-foreground">Nenhuma baixa registrada.</p></TableCell></TableRow>
               ) : (
                 (exits ?? []).map((e) => (
                   <TableRow key={e.id}>
                     <TableCell className="font-medium">{e.productName}</TableCell>
                     <TableCell>{e.quantity}</TableCell>
+                    <TableCell>R$ {e.totalCost.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</TableCell>
                     <TableCell>{e.reason}</TableCell>
                     <TableCell>{e.createdBy}</TableCell>
                     <TableCell className="text-muted-foreground text-sm">

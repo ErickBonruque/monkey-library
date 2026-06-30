@@ -21,6 +21,25 @@ model User {
 
   exits     StockExit[]
   entries   StockEntry[]
+  invitesSent       Invite[]        @relation("InvitesSent")
+  ordersCreated     PurchaseOrder[] @relation("OrderCreatedBy")
+  ordersApproved    PurchaseOrder[] @relation("OrderApprovedBy")
+}
+
+// Convite de usuário por e-mail. O administrador define o papel previamente e
+// o sistema gera um token de uso único com prazo de validade.
+model Invite {
+  id          String    @id @default(cuid())
+  email       String
+  role        String    // admin | manager | viewer
+  token       String    @unique
+  status      String    @default("pending") // pending | accepted | revoked
+  expiresAt   DateTime
+  createdAt   DateTime  @default(now())
+  acceptedAt  DateTime?
+
+  invitedById String?
+  invitedBy   User?     @relation("InvitesSent", fields: [invitedById], references: [id])
 }
 
 model Category {
@@ -45,12 +64,33 @@ model Product {
 
   exits       StockExit[]
   entries     StockEntry[]
+  batches     StockBatch[]
+  orderItems  PurchaseOrderItem[]
+}
+
+// Lote de estoque: cada entrada gera um lote com seu custo unitário. As baixas
+// consomem os lotes na ordem de chegada (FIFO), permitindo o custeio correto.
+model StockBatch {
+  id              String   @id @default(cuid())
+  quantity        Int      // saldo restante neste lote
+  initialQuantity Int      // quantidade original do lote
+  unitCost        Float    // custo unitário do lote
+  createdAt       DateTime @default(now())
+
+  productId       String
+  product         Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  entryId         String?     @unique
+  entry           StockEntry? @relation(fields: [entryId], references: [id], onDelete: SetNull)
+
+  consumptions    StockExitConsumption[]
 }
 
 model StockExit {
   id          String   @id @default(cuid())
   quantity    Int
   reason      String
+  totalCost   Float    @default(0) // custo total da baixa (CMV), apurado por lote
   createdAt   DateTime @default(now())
 
   productId   String
@@ -58,13 +98,30 @@ model StockExit {
 
   createdById String?
   createdBy   User?    @relation(fields: [createdById], references: [id])
+
+  consumptions StockExitConsumption[]
 }
 
-// Entrada (reposição) de estoque — espelha StockExit, mas soma ao saldo.
+// Liga uma baixa aos lotes efetivamente consumidos, registrando o custo de cada
+// parcela. É o que torna o cálculo de custo por lote (FIFO) rastreável.
+model StockExitConsumption {
+  id        String     @id @default(cuid())
+  quantity  Int
+  unitCost  Float
+
+  exitId    String
+  exit      StockExit  @relation(fields: [exitId], references: [id], onDelete: Cascade)
+
+  batchId   String
+  batch     StockBatch @relation(fields: [batchId], references: [id], onDelete: Cascade)
+}
+
+// Entrada (reposição) de estoque — gera um lote e soma ao saldo.
 model StockEntry {
   id          String   @id @default(cuid())
   quantity    Int
   reason      String
+  unitCost    Float    @default(0) // custo unitário do lote gerado por esta entrada
   createdAt   DateTime @default(now())
 
   productId   String
@@ -72,4 +129,42 @@ model StockEntry {
 
   createdById String?
   createdBy   User?    @relation(fields: [createdById], references: [id])
+
+  batch       StockBatch?
+
+  // Quando a entrada é fruto do recebimento de uma compra.
+  purchaseOrderId String?
+  purchaseOrder   PurchaseOrder? @relation(fields: [purchaseOrderId], references: [id], onDelete: SetNull)
+}
+
+// Solicitação de compra (reposição). Fluxo: pending -> approved -> received.
+model PurchaseOrder {
+  id          String    @id @default(cuid())
+  supplier    String
+  status      String    @default("pending") // pending | approved | received | cancelled
+  notes       String?
+  createdAt   DateTime  @default(now())
+  approvedAt  DateTime?
+  receivedAt  DateTime?
+
+  createdById String?
+  createdBy   User?     @relation("OrderCreatedBy", fields: [createdById], references: [id])
+
+  approvedById String?
+  approvedBy   User?    @relation("OrderApprovedBy", fields: [approvedById], references: [id])
+
+  items       PurchaseOrderItem[]
+  entries     StockEntry[]
+}
+
+model PurchaseOrderItem {
+  id              String   @id @default(cuid())
+  quantity        Int
+  unitCost        Float
+
+  purchaseOrderId String
+  purchaseOrder   PurchaseOrder @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
+
+  productId       String
+  product         Product  @relation(fields: [productId], references: [id])
 }

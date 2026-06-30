@@ -3,18 +3,33 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useState } from "react"
-import { LayoutDashboard, Users, UserPlus, Package2, ChevronDown } from "lucide-react"
+import { LayoutDashboard, Users, UserPlus, Package2, ShoppingCart, ChevronDown } from "lucide-react"
+import { useAuth } from "@/hooks/use-auth"
+import type { Role } from "@/types"
 
-const navItems = [
+// `roles` define quais papéis enxergam cada item. Ausente = todos os papéis.
+const navItems: {
+  href: string
+  label: string
+  icon: typeof LayoutDashboard
+  end?: boolean
+  roles?: Role[]
+}[] = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard, end: true },
-  { href: "/admin/usuarios", label: "Usuários", icon: Users },
-  { href: "/admin/convidar", label: "Convidar", icon: UserPlus },
   { href: "/admin/estoque", label: "Estoque", icon: Package2 },
+  { href: "/admin/compras", label: "Compras", icon: ShoppingCart },
+  { href: "/admin/usuarios", label: "Usuários", icon: Users, roles: ["admin"] },
+  { href: "/admin/convidar", label: "Convidar", icon: UserPlus, roles: ["admin"] },
 ]
 
 export function AdminSidebar() {
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const pathname = usePathname()
+  const { user } = useAuth()
+
+  const visibleItems = navItems.filter(
+    (item) => !item.roles || (user && item.roles.includes(user.role))
+  )
 
   return (
     <aside
@@ -28,7 +43,7 @@ export function AdminSidebar() {
       </div>
 
       <nav className="flex-1 py-4 px-2 flex flex-col gap-1">
-        {navItems.map(({ href, label, icon: Icon, end }) => {
+        {visibleItems.map(({ href, label, icon: Icon, end }) => {
           const isActive = end ? pathname === href : pathname.startsWith(href)
           return (
             <Link

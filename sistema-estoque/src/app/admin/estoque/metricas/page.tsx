@@ -8,7 +8,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Skeleton } from "@/components/shadcn/skeleton"
 import { PageHeader } from "@/components/shared/page-header"
 import { estoqueService } from "@/services/estoque-service"
-import { mockExitsByMonth, mockProductsByCategory } from "@/mocks"
 import { Bar, BarChart, CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts"
 import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from "@/components/shadcn/chart"
 
@@ -19,6 +18,10 @@ export default function MetricasPage() {
   const { data: kpis, isLoading } = useQuery({
     queryKey: ["kpis"],
     queryFn: () => estoqueService.getKPIs(),
+  })
+  const { data: charts } = useQuery({
+    queryKey: ["charts"],
+    queryFn: () => estoqueService.getCharts(),
   })
 
   const kpiCards = [
@@ -59,7 +62,7 @@ export default function MetricasPage() {
           <CardHeader><CardTitle className="text-base">Baixas por Mês</CardTitle></CardHeader>
           <CardContent>
             <ChartContainer config={exitsChartConfig} className="min-h-[220px] w-full">
-              <LineChart data={mockExitsByMonth} accessibilityLayer>
+              <LineChart data={charts?.movementsByMonth ?? []} accessibilityLayer>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="month" tick={{ fontSize: 12 }} />
                 <YAxis tick={{ fontSize: 12 }} />
@@ -74,7 +77,7 @@ export default function MetricasPage() {
           <CardHeader><CardTitle className="text-base">Produtos por Categoria</CardTitle></CardHeader>
           <CardContent>
             <ChartContainer config={categoriesChartConfig} className="min-h-[220px] w-full">
-              <BarChart data={mockProductsByCategory} accessibilityLayer>
+              <BarChart data={charts?.productsByCategory ?? []} accessibilityLayer>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="categoria" tick={{ fontSize: 11 }} />
                 <YAxis tick={{ fontSize: 12 }} />

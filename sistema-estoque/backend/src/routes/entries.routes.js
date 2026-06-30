@@ -1,9 +1,7 @@
 import { prisma } from "../lib/prisma.js"
 import { entryCreateSchema } from "../schemas.js"
 import { serializeEntry } from "../lib/serializers.js"
-
-// Sinaliza, de dentro da transação, que o produto informado não existe.
-class ProductNotFoundError extends Error {}
+import { createEntry, ProductNotFoundError } from "../lib/stock.js"
 
 export async function entryRoutes(app) {
   // GET /api/entries  (protegido — dado operacional do estoque)
@@ -26,42 +24,27 @@ export async function entryRoutes(app) {
     }
   )
 
-  // POST /api/entries  (protegido — admin ou manager) — registra entrada e soma à quantidade do produto
+  // POST /api/entries  (protegido — admin ou manager) — registra entrada,
+  // gera o lote com o custo informado e repõe o estoque.
   app.post(
     "/",
     {
       onRequest: [app.authenticate, app.authorize(["admin", "manager"])],
       schema: {
         tags: ["Entries"],
-        summary: "Registra uma entrada e repõe o estoque (transacional)",
+        summary: "Registra uma entrada (gera lote com custo) e repõe o estoque",
         security: [{ bearerAuth: [] }],
         body: entryCreateSchema,
       },
     },
     async (request, reply) => {
-      const { productId, quantity, reason } = request.body
-
+      const { productId, quantity, unitCost, reason } = request.body
       const userId = request.user.sub
 
-      // Controle de concorrência: a entrada e a atualização do saldo correm
-      // dentro de uma única transação. O incremento é aplicado de forma
-      // condicional (só se o produto existir), garantindo consistência mesmo
-      // sob movimentações simultâneas.
       try {
-        const entry = await prisma.$transaction(async (tx) => {
-          const updated = await tx.product.updateMany({
-            where: { id: productId },
-            data: { quantity: { increment: quantity } },
-          })
-          if (updated.count === 0) {
-            throw new ProductNotFoundError()
-          }
-          return tx.stockEntry.create({
-            data: { productId, quantity, reason, createdById: userId },
-            include: { product: true, createdBy: true },
-          })
-        })
-
+        const entry = await prisma.$transaction((tx) =>
+          createEntry(tx, { productId, quantity, unitCost, reason, userId })
+        )
         return reply.status(201).send(serializeEntry(entry))
       } catch (err) {
         if (err instanceof ProductNotFoundError) {

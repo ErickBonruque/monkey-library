@@ -11,6 +11,7 @@ interface AuthContextData {
   isLoading: boolean
   login: (email: string, password: string) => Promise<void>
   register: (name: string, email: string, password: string) => Promise<void>
+  setSession: (user: AuthUser, token: string) => void
   logout: () => void
 }
 
@@ -63,6 +64,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setAuth({ user: newUser, token: newToken })
   }, [])
 
+  // Aplica uma sessão já autenticada (ex.: após aceitar um convite, em que o
+  // back-end já devolve usuário + token).
+  const setSession = useCallback((sessionUser: AuthUser, sessionToken: string) => {
+    localStorage.setItem(STORAGE_KEY_TOKEN, sessionToken)
+    localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(sessionUser))
+    setAuth({ user: sessionUser, token: sessionToken })
+  }, [])
+
   const logout = useCallback(() => {
     localStorage.removeItem(STORAGE_KEY_TOKEN)
     localStorage.removeItem(STORAGE_KEY_USER)
@@ -71,7 +80,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ ...auth, isAuthenticated, isLoading, login, register: registerUser, logout }}
+      value={{ ...auth, isAuthenticated, isLoading, login, register: registerUser, setSession, logout }}
     >
       {children}
     </AuthContext.Provider>

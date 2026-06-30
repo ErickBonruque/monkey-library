@@ -19,6 +19,8 @@ import { exitRoutes } from "./routes/exits.routes.js"
 import { entryRoutes } from "./routes/entries.routes.js"
 import { kpiRoutes } from "./routes/kpis.routes.js"
 import { userRoutes } from "./routes/users.routes.js"
+import { inviteRoutes } from "./routes/invites.routes.js"
+import { purchaseRoutes } from "./routes/purchases.routes.js"
 
 export function buildApp() {
   // Configuração segura da autenticação: o segredo do JWT é obrigatório e
@@ -86,7 +88,9 @@ export function buildApp() {
         { name: "Categories", description: "Categorias de produtos" },
         { name: "Exits", description: "Baixas (saídas) de estoque" },
         { name: "Entries", description: "Entradas (reposições) de estoque" },
-        { name: "KPIs", description: "Métricas do dashboard" },
+        { name: "Purchases", description: "Solicitações de compra e reposição" },
+        { name: "Invites", description: "Convites de usuários por e-mail" },
+        { name: "KPIs", description: "Métricas e inteligência financeira" },
         { name: "Users", description: "Gestão de usuários" },
       ],
     },
@@ -155,6 +159,8 @@ export function buildApp() {
   app.register(categoryRoutes, { prefix: "/api/categories" })
   app.register(exitRoutes, { prefix: "/api/exits" })
   app.register(entryRoutes, { prefix: "/api/entries" })
+  app.register(purchaseRoutes, { prefix: "/api/purchases" })
+  app.register(inviteRoutes, { prefix: "/api/invites" })
   app.register(kpiRoutes, { prefix: "/api/kpis" })
   app.register(userRoutes, { prefix: "/api/users" })
 

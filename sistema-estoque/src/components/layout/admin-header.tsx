@@ -2,6 +2,8 @@
 
 import { useAuth } from "@/hooks/use-auth"
 import { Avatar, AvatarFallback } from "@/components/shadcn/avatar"
+import { Badge } from "@/components/shadcn/badge"
+import { roleLabels } from "@/lib/permissions"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,6 +37,11 @@ export function AdminHeader() {
             <AvatarFallback className="text-xs">{initials}</AvatarFallback>
           </Avatar>
           <span className="text-sm font-medium hidden sm:inline">{user?.name}</span>
+          {user && (
+            <Badge variant="secondary" className="hidden sm:inline-flex">
+              {roleLabels[user.role]}
+            </Badge>
+          )}
           <ChevronDown className="h-4 w-4 text-muted-foreground" />
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">

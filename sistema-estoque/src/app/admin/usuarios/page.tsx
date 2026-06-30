@@ -9,6 +9,7 @@ import { Badge } from "@/components/shadcn/badge"
 import { Skeleton } from "@/components/shadcn/skeleton"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/shadcn/table"
 import { EmptyState } from "@/components/shared/empty-state"
+import { RoleGuard } from "@/components/auth/role-guard"
 import { userService } from "@/services/user-service"
 import { useDebounce } from "@/hooks/use-debounce"
 
@@ -19,7 +20,7 @@ const roleVariant: Record<string, "default" | "secondary" | "outline"> = {
   viewer: "outline",
 }
 
-export default function UsuariosPage() {
+function UsuariosContent() {
   const [search, setSearch] = useState("")
   const debouncedSearch = useDebounce(search)
 
@@ -96,5 +97,13 @@ export default function UsuariosPage() {
         </Table>
       </div>
     </div>
+  )
+}
+
+export default function UsuariosPage() {
+  return (
+    <RoleGuard allow={["admin"]}>
+      <UsuariosContent />
+    </RoleGuard>
   )
 }
